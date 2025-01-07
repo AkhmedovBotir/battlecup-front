@@ -1,22 +1,18 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+async function getData() {
+  // Bu yerda serverdan ma'lumotlarni olish logikasi bo'lishi kerak
+  return {
+    isAuthenticated: false
+  };
+}
 
-export default function Dashboard() {
-  const router = useRouter();
+export default async function Dashboard() {
+  const { isAuthenticated } = await getData();
 
-  // TODO: Implement authentication check
-  useEffect(() => {
-    const checkAuth = async () => {
-      // Check if user is authenticated
-      const isAuthenticated = false; // Replace with actual auth check
-      if (!isAuthenticated) {
-        router.push('/auth/login');
-      }
-    };
-    checkAuth();
-  }, [router]);
+  if (!isAuthenticated) {
+    redirect('/auth/login');
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
