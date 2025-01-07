@@ -1,6 +1,22 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-export default function Dashboard() {
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function DashboardContent() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      // Check if user is authenticated
+      const isAuthenticated = false; // Replace with actual auth check
+      if (!isAuthenticated) {
+        router.push('/auth/login');
+      }
+    };
+    checkAuth();
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
