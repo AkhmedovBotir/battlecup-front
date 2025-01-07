@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import confetti from 'canvas-confetti'
 
-export default function VerifyPhone() {
+const VerifyPhoneContent = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState('');
@@ -216,4 +216,12 @@ export default function VerifyPhone() {
       </button>
     </div>
   )
+};
+
+export default function VerifyPhone() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyPhoneContent />
+    </Suspense>
+  );
 }
