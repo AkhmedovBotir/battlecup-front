@@ -1,44 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import icon from '../img/icon.png'
-
-const countries = {
-  uz: {
-    name: 'Uzbekistan',
-    code: '+998',
-    flag: 'https://flagcdn.com/w40/uz.png',
-    format: '## ###-##-##'
-  },
-  ru: {
-    name: 'Russia',
-    code: '+7',
-    flag: 'https://flagcdn.com/w40/ru.png',
-    format: '### ###-##-##'
-  },
-  kz: {
-    name: 'Kazakhstan',
-    code: '+7',
-    flag: 'https://flagcdn.com/w40/kz.png',
-    format: '### ###-##-##'
-  }
-};
+import countryData from '../data/countryPhoneCodes.json'
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
-  const [phone, setPhone] = useState('');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState('uz');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState(countryData.countries[23]); // O'zbekiston
+  const [phoneNumber, setPhoneNumber] = useState(countryData.countries[23].code + ' ');
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const phoneInputRef = useRef(null);
-  const [cursorPosition, setCursorPosition] = useState(0);
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -50,12 +28,7 @@ export default function ForgotPassword() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  useEffect(() => {
-    // Cursor pozitsiyasini tiklash
-    if (phoneInputRef.current) {
-      phoneInputRef.current.setSelectionRange(cursorPosition, cursorPosition);
-    }
-  }, [cursorPosition, phoneNumber]);
+
   useEffect(() => {
     if (timer > 0) {
       const countdown = setInterval(() => {
@@ -65,77 +38,108 @@ export default function ForgotPassword() {
     }
   }, [timer]);
 
-  const formatPhoneNumber = (value) => {
-    const country = countries[selectedCountry];
+  const formatPhoneNumber = (value, country) => {
+    if (!value) return '';
     
     // Faqat raqamlarni qoldirish
-    const numbers = value.replace(/\D/g, '');
-    const format = country.format;
-    let result = '';
-    let formatIndex = 0;
-    let numberIndex = 0;
-
-    while (formatIndex < format.length && numberIndex < numbers.length) {
-      if (format[formatIndex] === '#') {
-        result += numbers[numberIndex];
-        numberIndex++;
-      } else {
-        result += format[formatIndex];
-      }
-      formatIndex++;
+    let numbers = value.replace(/\D/g, '');
+    
+    // Agar kod bilan boshlangan bo'lsa, kodni olib tashlash
+    if (numbers.startsWith(country.code.replace(/\D/g, ''))) {
+      numbers = numbers.slice(country.code.replace(/\D/g, '').length);
     }
 
-    return result;
+    // Davlatga qarab formatlash
+    let formatted = '';
+    switch(country.code) {
+      case '+998': // O'zbekiston
+        if (numbers.length > 0) formatted += numbers.slice(0, 2);
+        if (numbers.length > 2) formatted += ' ' + numbers.slice(2, 5);
+        if (numbers.length > 5) formatted += ' ' + numbers.slice(5, 7);
+        if (numbers.length > 7) formatted += ' ' + numbers.slice(7, 9);
+        break;
+      case '+7': // Rossiya, Qozog'iston
+        if (numbers.length > 0) formatted += numbers.slice(0, 3);
+        if (numbers.length > 3) formatted += ' ' + numbers.slice(3, 6);
+        if (numbers.length > 6) formatted += ' ' + numbers.slice(6, 8);
+        if (numbers.length > 8) formatted += ' ' + numbers.slice(8, 10);
+        break;
+      default: // Boshqa davlatlar uchun
+        if (numbers.length > 0) formatted += numbers.slice(0, 3);
+        if (numbers.length > 3) formatted += ' ' + numbers.slice(3, 6);
+        if (numbers.length > 6) formatted += ' ' + numbers.slice(6, 9);
+    }
+
+    return formatted;
   };
 
   const handlePhoneChange = (e) => {
-    const input = e.target;
-    const selectionStart = input.selectionStart;
-    const previousValue = input.value;
-    const countryCode = countries[selectedCountry].code;
-
-    // Agar input bo'sh bo'lsa yoki kod bilan boshlanmasa
-    if (!input.value || !input.value.startsWith(countryCode)) {
-      input.value = countryCode + ' ';
-      setPhoneNumber(countryCode + ' ');
-      setCursorPosition(countryCode.length + 1);
-      return;
+    const input = e.target.value;
+    // Agar input kod bilan boshlanmagan bo'lsa, kodini qo'shish
+    const withCode = input.startsWith(selectedCountry.code) ? input : selectedCountry.code + ' ' + input;
+    const formatted = selectedCountry.code + ' ' + formatPhoneNumber(withCode, selectedCountry);
+    
+    // Maksimal uzunlikni tekshirish
+    const numbersOnly = formatted.replace(/\D/g, '');
+    const maxLength = selectedCountry.code === '+998' ? 12 : 11;
+    
+    if (numbersOnly.length <= maxLength) {
+      setPhoneNumber(formatted);
     }
+  };
 
-    let value = input.value.replace(/\D/g, '');
-    if (value.startsWith(countryCode.replace(/\D/g, ''))) {
-      value = value.slice(countryCode.replace(/\D/g, '').length);
-    }
-
-    const formattedNumber = countryCode + ' ' + formatPhoneNumber(value);
-    setPhoneNumber(formattedNumber);
-
-    // Cursor pozitsiyasini saqlash
-    const addedChars = formattedNumber.length - previousValue.length;
-    const newPosition = Math.max(countryCode.length + 1, selectionStart + addedChars);
-    setCursorPosition(newPosition);
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+    setIsDropdownOpen(false);
+    // Yangi davlat kodi bilan raqamni qayta formatlash
+    setPhoneNumber(country.code + ' ');
   };
 
   const handlePhoneSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      const fullPhone = countries[selectedCountry].code + phoneNumber.replace(/\D/g, '');
-      console.log('Sending code to:', fullPhone);
+      // Telefon raqamni tozalash va tekshirish
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+      if (cleanPhone.length < 10) {
+        setError('Telefon raqam noto\'g\'ri kiritilgan');
+        return;
+      }
+
+      // Telefon raqamni saqlash
+      setPhone(phoneNumber);
+      console.log('Sending code to:', phoneNumber);
+      
+      // Keyingi bosqichga o'tish
       setStep(2);
       setError('');
+      // Timer'ni boshlash
+      setTimer(60);
     } catch (err) {
-      setError('Ошибка при отправке кода');
+      setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring');
     }
   };
 
+  const filteredCountries = countryData.countries.filter(country =>
+    country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    country.code.includes(searchQuery)
+  );
+
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      // API call to verify code
+      const verificationCode = code.join('');
+      if (verificationCode.length !== 6) {
+        setError('Kodni to\'liq kiriting');
+        return;
+      }
+
+      console.log('Verifying code:', verificationCode);
       setStep(3);
       setError('');
     } catch (err) {
-      setError('Неверный код');
+      setError('Kod noto\'g\'ri. Qaytadan urinib ko\'ring');
     }
   };
 
@@ -150,19 +154,21 @@ export default function ForgotPassword() {
   };
 
   const handleCodeChange = (index, value) => {
-    if (value.length <= 1 && /^\d*$/.test(value)) {
-      const newCode = [...code];
-      newCode[index] = value;
-      setCode(newCode);
+    if (value.length > 1) return;
+    
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
 
-      if (value && index < 5) {
-        document.getElementById(`code-${index + 1}`).focus();
-      }
+    // Avtomatik keyingi maydonga o'tish
+    if (value !== '' && index < 5) {
+      document.getElementById(`code-${index + 1}`).focus();
     }
   };
 
   const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
+    // Backspace bosilganda oldingi maydonga qaytish
+    if (e.key === 'Backspace' && index > 0 && code[index] === '') {
       document.getElementById(`code-${index - 1}`).focus();
     }
   };
@@ -194,31 +200,51 @@ export default function ForgotPassword() {
                   className='w-6 h-6 bg-[#1A1D21] focus:outline-none rounded-md overflow-hidden flex items-center'
                 >
                   <img
-                    src={countries[selectedCountry].flag}
-                    alt={selectedCountry}
+                    src={selectedCountry.flag}
+                    alt={selectedCountry.code}
                     className='w-full h-full object-cover'
                   />
                 </button>
                 {isDropdownOpen && (
-                  <div className='absolute top-full left-0 mt-1 bg-[#1A1D21] border border-[#181C25] rounded-md overflow-hidden z-10 w-48'>
-                    {Object.entries(countries).map(([code, country]) => (
-                      <button
-                        key={code}
-                        onClick={() => {
-                          setSelectedCountry(code);
-                          setIsDropdownOpen(false);
-                        }}
-                        className='w-full px-3 py-2 hover:bg-[#232833] flex items-center gap-3'
-                      >
-                        <img
-                          src={country.flag}
-                          alt={code}
-                          className='w-6 h-6 object-cover rounded-sm'
+                  <div className='absolute top-full left-0 mt-2 bg-[#12151B] border border-[#1F2937] rounded-xl overflow-hidden z-10 w-[320px] shadow-lg'>
+                    <div className='p-3 sticky top-0 bg-[#12151B] border-b border-[#1F2937]'>
+                      <div className='relative'>
+                        <input 
+                          type="text" 
+                          value={searchQuery} 
+                          onChange={(e) => setSearchQuery(e.target.value)} 
+                          className='w-full p-2.5 pl-10 bg-[#1A1D21] border border-[#1F2937] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] text-white text-sm'
+                          placeholder='Davlatni qidirish...'
                         />
-                        <span className='text-white text-sm'>{country.name}</span>
-                        <span className='text-[#475065] text-sm ml-auto'>{country.code}</span>
-                      </button>
-                    ))}
+                        <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className='overflow-y-auto max-h-[280px] py-2'>
+                      {filteredCountries.map((country) => (
+                        <button
+                          key={country.code}
+                          onClick={() => handleCountrySelect(country)}
+                          className='w-full px-4 py-2.5 hover:bg-[#1A1D21] flex items-center gap-3 transition-all duration-200'
+                        >
+                          <img 
+                            src={country.flag} 
+                            alt={country.name}
+                            className='w-7 h-7 object-cover rounded'
+                          />
+                          <div className='flex flex-col items-start'>
+                            <span className='text-white text-sm font-medium'>{country.name}</span>
+                            <span className='text-[#6B7280] text-xs'>{country.code}</span>
+                          </div>
+                        </button>
+                      ))}
+                      {filteredCountries.length === 0 && (
+                        <div className='text-center py-4 text-gray-400 text-sm'>
+                          Davlat topilmadi
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -226,13 +252,12 @@ export default function ForgotPassword() {
                 type="tel"
                 ref={phoneInputRef}
                 onChange={handlePhoneChange}
-                value={phoneNumber || countries[selectedCountry].code + ' '}
+                value={phoneNumber}
                 className='border-2 border-[#181C25] w-full pl-10 pr-4 py-3 bg-[#12151B] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder={countries[selectedCountry].code + ' ' + formatPhoneNumber('')}
+                placeholder={selectedCountry.code + ' '}
                 onFocus={(e) => {
                   if (!phoneNumber) {
-                    setPhoneNumber(countries[selectedCountry].code + ' ');
-                    setCursorPosition(countries[selectedCountry].code.length + 1);
+                    setPhoneNumber(selectedCountry.code + ' ');
                   }
                 }}
               />
@@ -255,7 +280,7 @@ export default function ForgotPassword() {
                 мы отправили код подтверждения на<br />
                 ваш номер телефона:
               </div>
-              <div className='text-white'>{phone}</div>
+              <div className='text-white'>{phoneNumber}</div>
 
               <div className='flex justify-center gap-2 items-center'>
                 {code.map((digit, index) => (

@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import icon from '../img/icon.png'
+import countryData from '../data/countryPhoneCodes.json';
 
 export default function Register() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState('uz');
+  const [selectedCountry, setSelectedCountry] = useState(countryData.countries[23]); // Default to Uzbekistan
   const [phoneNumber, setPhoneNumber] = useState('');
   const [cursorPosition, setCursorPosition] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
   const phoneInputRef = useRef(null);
   const navigate = useNavigate();
@@ -25,82 +27,73 @@ export default function Register() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const countries = {
-    uz: {
-      code: '+998',
-      format: '## ### ## ##',
-      flag: 'https://flagcdn.com/w40/uz.png',
-      name: 'Узбекистан'
-    },
-    ru: {
-      code: '+7',
-      format: '### ### ## ##',
-      flag: 'https://flagcdn.com/w40/ru.png',
-      name: 'Россия'
-    },
-    kz: {
-      code: '+7',
-      format: '### ### ## ##',
-      flag: 'https://flagcdn.com/w40/kz.png',
-      name: 'Казахстан'
-    }
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+    setIsDropdownOpen(false);
+    // Yangi davlat kodi bilan raqamni qayta formatlash
+    setPhoneNumber(country.code + ' ');
   };
 
-  const formatPhoneNumber = (value) => {
-    const country = countries[selectedCountry];
-    if (!value) return country.code;
+  const formatPhoneNumber = (value, country) => {
+    if (!value) return '';
     
     // Faqat raqamlarni qoldirish
-    const numbers = value.replace(/\D/g, '');
-    const format = country.format;
-    let result = country.code + ' ';
-    let formatIndex = 0;
-    let numberIndex = 0;
-
-    while (formatIndex < format.length && numberIndex < numbers.length) {
-      if (format[formatIndex] === '#') {
-        result += numbers[numberIndex];
-        numberIndex++;
-      } else {
-        result += format[formatIndex];
-      }
-      formatIndex++;
+    let numbers = value.replace(/\D/g, '');
+    
+    // Agar kod bilan boshlangan bo'lsa, kodni olib tashlash
+    if (numbers.startsWith(country.code.replace(/\D/g, ''))) {
+      numbers = numbers.slice(country.code.replace(/\D/g, '').length);
     }
 
-    return result;
+    // Davlatga qarab formatlash
+    let formatted = '';
+    switch(country.code) {
+      case '+998': // O'zbekiston
+        if (numbers.length > 0) formatted += numbers.slice(0, 2);
+        if (numbers.length > 2) formatted += ' ' + numbers.slice(2, 5);
+        if (numbers.length > 5) formatted += ' ' + numbers.slice(5, 7);
+        if (numbers.length > 7) formatted += ' ' + numbers.slice(7, 9);
+        break;
+      case '+7': // Rossiya, Qozog'iston
+        if (numbers.length > 0) formatted += numbers.slice(0, 3);
+        if (numbers.length > 3) formatted += ' ' + numbers.slice(3, 6);
+        if (numbers.length > 6) formatted += ' ' + numbers.slice(6, 8);
+        if (numbers.length > 8) formatted += ' ' + numbers.slice(8, 10);
+        break;
+      default: // Boshqa davlatlar uchun
+        if (numbers.length > 0) formatted += numbers.slice(0, 3);
+        if (numbers.length > 3) formatted += ' ' + numbers.slice(3, 6);
+        if (numbers.length > 6) formatted += ' ' + numbers.slice(6, 9);
+    }
+
+    return formatted;
   };
 
   const handlePhoneChange = (e) => {
-    const input = e.target;
-    const selectionStart = input.selectionStart;
-    const previousValue = input.value;
+    const input = e.target.value;
+    // Agar input kod bilan boshlanmagan bo'lsa, kodini qo'shish
+    const withCode = input.startsWith(selectedCountry.code) ? input : selectedCountry.code + ' ' + input;
+    const formatted = selectedCountry.code + ' ' + formatPhoneNumber(withCode, selectedCountry);
     
-    let value = input.value.replace(/\D/g, '');
-    if (value.startsWith(countries[selectedCountry].code.replace(/\D/g, ''))) {
-      value = value.slice(countries[selectedCountry].code.replace(/\D/g, '').length);
+    // Maksimal uzunlikni tekshirish
+    const numbersOnly = formatted.replace(/\D/g, '');
+    const maxLength = selectedCountry.code === '+998' ? 12 : 11;
+    
+    if (numbersOnly.length <= maxLength) {
+      setPhoneNumber(formatted);
     }
-    
-    const formattedNumber = formatPhoneNumber(value);
-    setPhoneNumber(formattedNumber);
-    input.value = formattedNumber;
-
-    // Cursor pozitsiyasini saqlash
-    const addedChars = formattedNumber.length - previousValue.length;
-    const newPosition = selectionStart + addedChars;
-    setCursorPosition(newPosition);
   };
 
   useEffect(() => {
-    // Davlat o'zgarganda telefon raqamni yangilash
-    setPhoneNumber(countries[selectedCountry].code);
-  }, [selectedCountry]);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
 
-  useEffect(() => {
-    // Cursor pozitsiyasini tiklash
-    if (phoneInputRef.current) {
-      phoneInputRef.current.setSelectionRange(cursorPosition, cursorPosition);
-    }
-  }, [cursorPosition, phoneNumber]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,6 +107,11 @@ export default function Register() {
       setError(err.message || 'Ошибка при регистрации');
     }
   }
+
+  const filteredCountries = countryData.countries.filter(country =>
+    country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    country.code.includes(searchQuery)
+  );
 
   return (
     <div className='text-center text-white h-screen flex flex-col items-center justify-center space-y-6'>
@@ -140,7 +138,7 @@ export default function Register() {
               <div className='absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none'>
                 <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.85164 16.1267C5.37792 17.0042 1.51392 18.7959 3.86736 21.0381C5.01699 22.1333 6.29739 22.9167 7.90716 22.9167H17.0928C18.7026 22.9167 19.983 22.1333 21.1326 21.0381C23.486 18.7959 19.6221 17.0042 18.1483 16.1267C14.6925 14.0689 10.3075 14.0689 6.85164 16.1267Z" stroke="#475065" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M17.1875 6.77087C17.1875 9.35971 15.0889 11.4584 12.5 11.4584C9.91117 11.4584 7.8125 9.35971 7.8125 6.77087C7.8125 4.18204 9.91117 2.08337 12.5 2.08337C15.0889 2.08337 17.1875 4.18204 17.1875 6.77087Z" stroke="#475065" stroke-width="2" />
+                  <path d="M17.1875 6.77087C17.1875 9.35971 15.0889 11.4584 12.5 11.4584C9.91117 11.4584 7.8125 9.35971 7.8125 6.77087C7.8125 4.18204 9.91117 2.08337 12.5 2.08337C15.0889 2.08337 17.1875 4.18204 17.1875 6.77087Z" stroke="#475065" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </div>
               <input type="text" className='border-2 border-[#181C25] w-full pl-10 pr-4 py-3 bg-[#12151B] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='Логин' />
@@ -154,31 +152,51 @@ export default function Register() {
                   className='w-6 h-6 bg-[#1A1D21] focus:outline-none rounded-md overflow-hidden flex items-center'
                 >
                   <img 
-                    src={countries[selectedCountry].flag} 
-                    alt={selectedCountry}
+                    src={selectedCountry.flag} 
+                    alt={selectedCountry.code}
                     className='w-full h-full object-cover'
                   />
                 </button>
                 {isDropdownOpen && (
-                  <div className='absolute top-full left-0 mt-1 bg-[#1A1D21] border border-[#181C25] rounded-md overflow-hidden z-10 w-48'>
-                    {Object.entries(countries).map(([code, country]) => (
-                      <button
-                        key={code}
-                        onClick={() => {
-                          setSelectedCountry(code);
-                          setIsDropdownOpen(false);
-                        }}
-                        className='w-full px-3 py-2 hover:bg-[#232833] flex items-center gap-3'
-                      >
-                        <img 
-                          src={country.flag} 
-                          alt={code}
-                          className='w-6 h-6 object-cover rounded-sm'
+                  <div className='absolute top-full left-0 mt-2 bg-[#12151B] border border-[#1F2937] rounded-xl overflow-hidden z-10 w-[320px] shadow-lg'>
+                    <div className='p-3 sticky top-0 bg-[#12151B] border-b border-[#1F2937]'>
+                      <div className='relative'>
+                        <input 
+                          type="text" 
+                          value={searchQuery} 
+                          onChange={(e) => setSearchQuery(e.target.value)} 
+                          className='w-full p-2.5 pl-10 bg-[#1A1D21] border border-[#1F2937] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] text-white text-sm'
+                          placeholder='Davlatni qidirish...'
                         />
-                        <span className='text-white text-sm'>{country.name}</span>
-                        <span className='text-[#475065] text-sm ml-auto'>{country.code}</span>
-                      </button>
-                    ))}
+                        <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className='overflow-y-auto max-h-[280px] py-2'>
+                      {filteredCountries.map((country) => (
+                        <button
+                          key={country.code}
+                          onClick={() => handleCountrySelect(country)}
+                          className='w-full px-4 py-2.5 hover:bg-[#1A1D21] flex items-center gap-3 transition-all duration-200'
+                        >
+                          <img 
+                            src={country.flag} 
+                            alt={country.name}
+                            className='w-7 h-7 object-cover rounded'
+                          />
+                          <div className='flex flex-col items-start'>
+                            <span className='text-white text-sm font-medium'>{country.name}</span>
+                            <span className='text-[#6B7280] text-xs'>{country.code}</span>
+                          </div>
+                        </button>
+                      ))}
+                      {filteredCountries.length === 0 && (
+                        <div className='text-center py-4 text-gray-400 text-sm'>
+                          Davlat topilmadi
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -188,7 +206,7 @@ export default function Register() {
                 onChange={handlePhoneChange}
                 value={phoneNumber}
                 className='border-2 border-[#181C25] w-full pl-10 pr-4 py-3 bg-[#12151B] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder={formatPhoneNumber('')}
+                placeholder={selectedCountry.code}
               />
             </div>
 
@@ -281,15 +299,6 @@ export default function Register() {
           </button>
         </form>
       </div>
-      {/* <button
-        onClick={() => navigate(-1)}
-        className='text-gray-400 hover:text-white flex items-center justify-center space-x-1'
-      >
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M13.75 5.5C13.75 5.5 8.25001 9.55066 8.25 11C8.24999 12.4494 13.75 16.5 13.75 16.5" stroke="#475065" stroke-width="1.5625" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Назад</span>
-      </button> */}
     </div>
   )
 }
