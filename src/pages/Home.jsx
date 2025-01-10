@@ -98,17 +98,11 @@ const tournaments = [
 ]
 
 export default function Home() {
-  const user = {
-    id: '864844',
-    nickname: 'Uzoomak1',
-    rank: 'General Manager',
-    country: 'Uzbekistan',
-    flag: 'https://purecatamphetamine.github.io/country-flag-icons/3x2/UZ.svg'
-  }
+
 
   return (
     <>
-      <Navbar user={user} />
+      <Navbar/>
       
       {/* Hero Section */}
       <div className='relative w-full h-[400px] overflow-hidden mb-10'>
