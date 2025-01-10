@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import banner from '../img/banner.png'
 import avatar from '../img/avatar.png'
 import Navbar from '../components/Navbar'
-import ProfileStats from '../components/profile/ProfileStats'
 import rankBadge from '../assets/svg/rank-badge.svg'
 import onlineStatus from '../assets/svg/online-status.svg'
 import userAdd from '../assets/svg/user-add.svg'
@@ -15,7 +14,6 @@ import telegram from "../assets/svg/telegram.svg"
 import instagram from "../assets/svg/instagram.svg"
 import whatsapp from "../assets/svg/whatsapp.svg"
 import vk from "../assets/svg/vk.svg"
-import ProfileStatistics from '../components/profile/profileStatistics'
 
 export default function Profile() {
     const user = {
@@ -37,10 +35,36 @@ export default function Profile() {
     };
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('profile');
+    const [activeTab, setActiveTab] = useState('info');
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Sync active tab with current route
+    useEffect(() => {
+        const path = location.pathname.split('/').pop();
+        switch (path) {
+            case 'info':
+                setActiveTab('info');
+                break;
+            case 'statistics':
+                setActiveTab('statistics');
+                break;
+            case 'matches':
+                setActiveTab('matches');
+                break;
+            case 'awards':
+                setActiveTab('awards');
+                break;
+            case 'forums':
+                setActiveTab('forums');
+                break;
+            default:
+                setActiveTab('info');
+        }
+    }, [location.pathname]);
 
     return (
-        <div className='min-h-screen bg-[#0B0D10]'>
+        <div className='min-h-screen'>
             {/* Header */}
             <Navbar user={user} />
 
@@ -66,12 +90,12 @@ export default function Profile() {
                     <div className='px-8 flex flex-row space-y-4'>
                         <div className='relative mt-[-5rem]'>
                             <div className='relative'>
-                                <img src={avatar} alt="Avatar" className='w-[10.625rem] h-[10.625rem] rounded-lg border-4 border-[#12151B]' />
+                                <img src={avatar} alt="Avatar" className='w-[10.625rem] h-[10rem] rounded-lg border-4 border-[#12151B]' />
                             </div>
                         </div>
-                        <div className='flex items-end h-full justify-between w-full'>
+                        <div className='flex items-start h-full justify-between w-full' style={{ marginTop: '.7rem' }}>
                             <div className='flex flex-col items-start ml-[1.5rem]'>
-                                <div className='flex flex-row space-y-1 items-center'>
+                                <div className='flex flex-row items-center'>
                                     <img src={user.flag} alt="Country" className='w-[1.25rem] h-[1.063rem] rounded' />
                                     <h1 className='text-white text-[1.25rem] px-2 mt-0'>{user.nickname}</h1>
                                     <div className='flex items-center space-x-1 mx-3'>
@@ -86,14 +110,14 @@ export default function Profile() {
                                     <p className='text-[#20C867] text-gradient-to-r from-[#153B73] to-[#1E498A]'>Сейчас в сети</p>
                                 </div>
                             </div>
-                            <div className='flex items-center h-full space-x-3'>
-                                <button className='border border-[#2576F0] bg-gradient-to-t from-[#153B73] to-[#1E498A] hover:from-[#1E498A] hover:to-[#153B73] text-[#fff] font-medium py-3 px-4 rounded-md transition-all duration-300 flex gap-2 flex-row items-center'>
+                            <div className='flex flex-row items-center h-full space-x-3'>
+                                <button className='border border-[#2576F0] bg-gradient-to-t from-[#153B73] to-[#1E498A] hover:from-[#1E498A] hover:to-[#153B73] text-[#fff] font-medium py-2 px-4 rounded-md transition-all duration-300 flex gap-2 flex-row items-center'>
                                     <img src={userAdd} alt="" />
                                     Добавить в друзья
                                 </button>
                                 <button
                                     type="button"
-                                    className='border border-[#333A49] bg-gradient-to-t from-[#1B1F27] to-[#232833] hover:from-[#232833] hover:to-[#1B1F27] text-[#D6E6FF] font-medium py-3 px-4 rounded-md transition-all duration-300 flex gap-2 flex-row items-center'
+                                    className='border border-[#333A49] bg-gradient-to-t from-[#1B1F27] to-[#232833] hover:from-[#232833] hover:to-[#1B1F27] text-[#D6E6FF] font-medium py-2 px-4 rounded-md transition-all duration-300 flex gap-2 flex-row items-center'
                                 >
                                     <img src={mail} />
                                     Сообщение
@@ -102,7 +126,7 @@ export default function Profile() {
                                     <button
                                         type="button"
                                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                        className='border border-[#333A49] bg-gradient-to-t from-[#1B1F27] to-[#232833] hover:from-[#232833] hover:to-[#1B1F27] text-[#D6E6FF] font-medium py-3 px-4 rounded-md transition-all duration-300 flex gap-2 flex-row items-center'
+                                        className='border border-[#333A49] bg-gradient-to-t from-[#1B1F27] to-[#232833] hover:from-[#232833] hover:to-[#1B1F27] text-[#D6E6FF] font-medium py-2 px-4 rounded-md transition-all duration-300 flex gap-2 flex-row items-center'
                                     >
                                         Ещё
                                         <img src={menu} alt="Menu" className='text-white' />
@@ -135,7 +159,7 @@ export default function Profile() {
                             </div>
                         </div>
                     </div>
-                    <div className='my-5 mt-10 h-0 border-b border-[#181C25]'></div>
+                    <div className='my-5 mb-0 h-0 border-b border-[#181C25]'></div>
 
                     {/* User Stats */}
                     <div className='flex items-center justify-between px-6 py-4 space-x-8'>
@@ -203,46 +227,64 @@ export default function Profile() {
                 </div>
 
                 {/* Navigation */}
-                <div className='flex justify-around mt-8 border border-[#181C25] bg-[#12151B]'>
-                    <button
-                        onClick={() => setActiveTab('profile')}
-                        className={`py-5 ${activeTab === 'profile' ? 'text-white border-b-2 border-[#2576F0]' : 'text-[#8B95A9]'} hover:text-white -mb-[2px]`}
-                    >
-                        Профиль
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('dota')}
-                        className={`py-5 ${activeTab === 'dota' ? 'text-white border-b-2 border-[#2576F0]' : 'text-[#8B95A9]'} hover:text-white -mb-[2px]`}
-                    >
-                        Дота статистика
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('matches')}
-                        className={`py-5 ${activeTab === 'matches' ? 'text-white border-b-2 border-[#2576F0]' : 'text-[#8B95A9]'} hover:text-white -mb-[2px]`}
-                    >
-                        Матчлист
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('awards')}
-                        className={`py-5 ${activeTab === 'awards' ? 'text-white border-b-2 border-[#2576F0]' : 'text-[#8B95A9]'} hover:text-white -mb-[2px]`}
-                    >
-                        Награды
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('forums')}
-                        className={`py-5 ${activeTab === 'forums' ? 'text-white border-b-2 border-[#2576F0]' : 'text-[#8B95A9]'} hover:text-white -mb-[2px]`}
-                    >
-                        Форумы
-                    </button>
+                <div className='mt-6 border border-[#181C25] bg-[#12151B]'>
+                    <div className='flex justify-around border border-[#181C25] bg-[#12151B]'>
+                        <button
+                            onClick={() => {
+                                setActiveTab('info')
+                                navigate('info')
+                            }}
+                            className={`py-5 relative group ${activeTab === 'info' ? 'text-white' : 'text-[#8B95A9] hover:text-white transition-colors'}`}
+                        >
+                            <span>Профиль</span>
+                            <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] transition-transform duration-200 ${activeTab === 'info' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setActiveTab('statistics')
+                                navigate('statistics')
+                            }}
+                            className={`py-5 relative group ${activeTab === 'statistics' ? 'text-white' : 'text-[#8B95A9] hover:text-white transition-colors'}`}
+                        >
+                            <span>Дота статистика</span>
+                            <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] transition-transform duration-200 ${activeTab === 'statistics' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setActiveTab('matches')
+                                navigate('matches')
+                            }}
+                            className={`py-5 relative group ${activeTab === 'matches' ? 'text-white' : 'text-[#8B95A9] hover:text-white transition-colors'}`}
+                        >
+                            <span>Матчлисть</span>
+                            <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] transition-transform duration-200 ${activeTab === 'matches' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setActiveTab('awards')
+                                navigate('awards')
+                            }}
+                            className={`py-5 relative group ${activeTab === 'awards' ? 'text-white' : 'text-[#8B95A9] hover:text-white transition-colors'}`}
+                        >
+                            <span>Награды</span>
+                            <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] transition-transform duration-200 ${activeTab === 'awards' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setActiveTab('forums')
+                                navigate('forums')
+                            }}
+                            className={`py-5 relative group ${activeTab === 'forums' ? 'text-white' : 'text-[#8B95A9] hover:text-white transition-colors'}`}
+                        >
+                            <span>Форумы</span>
+                            <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] transition-transform duration-200 ${activeTab === 'forums' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></div>
+                        </button>
+                    </div>
                 </div>
 
-                {/* Tab Content */}
-                <div className='mt-6'>
-                    {activeTab === 'profile' && <ProfileStats />}
-                    {activeTab === 'dota' && <ProfileStatistics />}
-                    {activeTab === 'matches' && <div className='text-white'>O'yinlar ro'yxati tez orada...</div>}
-                    {activeTab === 'awards' && <div className='text-white'>Mukofotlar tez orada...</div>}
-                    {activeTab === 'forums' && <div className='text-white'>Forum postlari tez orada...</div>}
+                {/* Content */}
+                <div className='mt-4'>
+                    <Outlet />
                 </div>
             </div>
         </div>

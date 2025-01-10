@@ -11,7 +11,7 @@ export default function Navbar({ user }) {
   }
 
   return (
-    <header className='bg-[#12151B] border-b border-[#181C25]'>
+    <header className='bg-[#12151B] border-b border-[#181C25] sticky top-0 z-50'>
       <div className='max-w-[1062px] mx-auto px-4'>
         <div className='flex items-center justify-between h-16'>
           {/* Logo */}

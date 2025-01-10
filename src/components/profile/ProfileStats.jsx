@@ -1,6 +1,5 @@
 import React from 'react';
 import leftSvg from '../../assets/svg/left.svg';
-import rankingSvg from '../../assets/svg/ranking.svg';
 import menu05Svg from '../../assets/svg/menu-05.svg';
 import pinSvg from '../../assets/svg/pin.svg';
 import editSvg from '../../assets/svg/edit.svg';
@@ -189,11 +188,12 @@ export default function ProfileStats() {
           <div className="flex-1 bg-[#12151B] border border-[#181C25]">
             <div className='p-4 flex items-center justify-between border-b border-[#181C25]'>
               <div className='flex items-center gap-2'>
-                <svg width={20} height={20} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15.8333 17.5H4.16667C3.24619 17.5 2.5 16.7538 2.5 15.8333V4.16667C2.5 3.24619 3.24619 2.5 4.16667 2.5H15.8333C16.7538 2.5 17.5 3.24619 17.5 4.16667V15.8333C17.5 16.7538 16.7538 17.5 15.8333 17.5Z" stroke="#8B95A9" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M7.5 8.33333C8.42047 8.33333 9.16667 7.58714 9.16667 6.66667C9.16667 5.74619 8.42047 5 7.5 5C6.57953 5 5.83333 5.74619 5.83333 6.66667C5.83333 7.58714 6.57953 8.33333 7.5 8.33333Z" stroke="#8B95A9" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M3.33331 15.8333L7.08331 12.0833C7.31331 11.8533 7.68665 11.8533 7.91665 12.0833L10.4166 14.5833C10.6466 14.8133 11.02 14.8133 11.25 14.5833L13.3333 12.5C13.5633 12.27 13.9366 12.27 14.1666 12.5L16.6666 15" stroke="#8B95A9" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.6666 7.08335C11.6666 8.0038 10.9205 8.75002 9.99998 8.75002C9.07948 8.75002 8.33331 8.0038 8.33331 7.08335C8.33331 6.16288 9.07948 5.41669 9.99998 5.41669C10.9205 5.41669 11.6666 6.16288 11.6666 7.08335Z" stroke="#8993A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M7.99171 11.3735C7.46773 11.6806 6.09386 12.3078 6.93063 13.0925C7.33939 13.4758 7.79464 13.75 8.36702 13.75H11.633C12.2054 13.75 12.6607 13.4758 13.0694 13.0925C13.9062 12.3078 12.5324 11.6806 12.0084 11.3735C10.7796 10.6533 9.22043 10.6533 7.99171 11.3735Z" stroke="#8993A6" stroke-width="1.25" stroke-linejoin="round" />
+                  <path d="M17.5 9.31944V6.90026C17.5 5.53359 17.5 4.85025 17.1632 4.40443C16.8265 3.9586 16.0651 3.74215 14.5423 3.30927C13.5018 3.01352 12.5847 2.65721 11.8519 2.33193C10.8528 1.88844 10.3533 1.66669 10 1.66669C9.64667 1.66669 9.14717 1.88844 8.14809 2.33193C7.41532 2.65721 6.4982 3.01351 5.45778 3.30927C3.93494 3.74215 3.17352 3.9586 2.83676 4.40443C2.5 4.85025 2.5 5.53359 2.5 6.90026V9.31944C2.5 14.0071 6.71897 16.8196 8.82833 17.9329C9.33425 18.1999 9.58717 18.3334 10 18.3334C10.4128 18.3334 10.6657 18.1999 11.1717 17.9329C13.281 16.8196 17.5 14.0071 17.5 9.31944Z" stroke="#8993A6" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
+
                 <span className='text-[#8B95A9]'>Команда</span>
               </div>
               <button className='text-[#59606F] text-sm flex items-center gap-2'>
