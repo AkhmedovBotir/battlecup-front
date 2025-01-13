@@ -10,6 +10,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8MB
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
         runtimeCaching: [
           {
@@ -40,8 +41,44 @@ export default defineConfig({
               },
             },
           },
+          {
+            urlPattern: /\.(png|jpg|jpeg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'large-images-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
         ],
+        skipWaiting: true,
+        clientsClaim: true,
       },
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      manifest: {
+        name: 'BattleCup',
+        short_name: 'BattleCup',
+        description: 'Dota 2 turnirlar platformasi',
+        theme_color: '#0B0D10',
+        icons: [
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      }
     }),
     legacy({
       targets: ['defaults', 'not IE 11'],
@@ -75,6 +112,7 @@ export default defineConfig({
     sourcemap: false,
     cssCodeSplit: true,
     chunkSizeWarningLimit: 1000,
+    assetsInlineLimit: 4096,
   },
   server: {
     cors: true,
