@@ -105,10 +105,11 @@ const LevelProgress = ({ level, xp }) => {
 };
 
 import React, { useRef } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation, NavLink, Outlet } from 'react-router-dom'
 import Navbar from '../components/Navbar';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import sword2 from '../assets/svg/sword2.svg';
+import alert2 from '../assets/svg/alert2.svg';
 import danger from '../assets/svg/danger.svg';
 // Hero icons
 const heroIcons = {
@@ -485,69 +486,27 @@ const user = {
   flag: 'https://purecatamphetamine.github.io/country-flag-icons/3x2/UZ.svg',
 };
 
-const QuestionIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="text-[#8993A6] hover:text-white transition-colors"
-  >
-    <circle cx="12" cy="12" r="10"></circle>
-    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-  </svg>
-);
-
-const LevelTooltip = () => (
-  <Tooltip className='custom-tooltip bg-[#12151B] border border-[#8993A6] rounded-lg'>
-    <div className='p-3'>
-      <div className='font-bold mb-2 text-white'>Daraja yo'llari:</div>
-      <div className='grid grid-cols-2 gap-2 text-[#8993A6]'>
-        <div>1-daraja: 0 - 199</div>
-        <div>14-daraja: 10400 - 11899</div>
-        <div>2-daraja: 200 - 499</div>
-        <div>15-daraja: 11900 - 13499</div>
-        <div>3-daraja: 500 - 899</div>
-        <div>16-daraja: 13500 - 15199</div>
-        <div>4-daraja: 900 - 1399</div>
-        <div>17-daraja: 15200 - 16999</div>
-        <div>5-daraja: 1400 - 1999</div>
-        <div>18-daraja: 17000 - 18899</div>
-        <div>6-daraja: 2000 - 2599</div>
-        <div>19-daraja: 18900 - 20899</div>
-        <div>7-daraja: 2600 - 3199</div>
-        <div>20-daraja: 20900 - 22999</div>
-        <div>8-daraja: 3200 - 4399</div>
-        <div>21-daraja: 23000 - 25199</div>
-        <div>9-daraja: 4400 - 5399</div>
-        <div>22-daraja: 25200 - 27499</div>
-        <div>10-daraja: 5400 - 5999</div>
-        <div>23-daraja: 27500 - 29899</div>
-        <div>11-daraja: 6000 - 8199</div>
-        <div>24-daraja: 29900 - 32399</div>
-        <div>12-daraja: 8200 - 8999</div>
-        <div>25-daraja: 32400+</div>
-        <div>13-daraja: 9000 - 10399</div>
-      </div>
-    </div>
-  </Tooltip>
-);
-
 export default function MatchDetails() {
   const { matchId } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const currentPath = location.pathname.split('/').pop()
+  const isChatPage = location.pathname.includes('/chat');
+
+  const tabs = [
+    { id: 'overview', label: 'Обзор' },
+    { id: 'playstyle', label: 'Стиль игры' },
+    { id: 'items', label: 'Предметы' },
+    { id: 'graph', label: 'График игры' },
+    { id: 'chat', label: 'Общение (чат)' }
+  ]
 
   return (
     <>
       <Navbar user={user} />
       <div className='max-w-[1335px] mx-auto px-4 py-5'>
         {/* Header */}
-        <div className='flex items-center justify-between mb-5'>
+        <div className={`flex items-center justify-between mb-5 ${isChatPage ? 'max-w-[1064px] mx-auto' : ''}`}>
           <Link to="/profile/matches" className='flex items-center gap-2 text-[#8993A6] hover:text-white transition-colors'>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.5 16.25L6.25 10L12.5 3.75" stroke="currentColor" strokeWidth="1.66" strokeLinecap="round" strokeLinejoin="round" />
@@ -590,224 +549,56 @@ export default function MatchDetails() {
         </div>
 
         {/* Tabs */}
-        <div className='my-6 border border-[#181C25] bg-[#12151B] rounded-[5px]'>
+        <div className={`my-6 border border-[#181C25] bg-[#12151B] rounded-[5px] ${isChatPage ? 'max-w-[1064px] mx-auto' : ''}`}>
           <div className='flex justify-between bg-[#12151B]'>
             <div className='flex pl-5'>
-              <button className='px-2 mx-3 py-3 text-white relative group'>
-                <div className='flex flex-col items-center'>
-                  <span>Обзор</span>
-                  <div className='absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0]'></div>
-                </div>
-              </button>
-              <button className='px-2 mx-3 py-3 text-[#8993A6] hover:text-white transition-colors relative group'>
-                <div className='flex flex-col items-center'>
-                  <span>Стиль игры</span>
-                  <div className='absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] scale-x-0 group-hover:scale-x-100 transition-transform duration-200'></div>
-                </div>
-              </button>
-              <button className='px-2 mx-3 py-3 text-[#8993A6] hover:text-white transition-colors relative group'>
-                <div className='flex flex-col items-center'>
-                  <span>Предметы</span>
-                  <div className='absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] scale-x-0 group-hover:scale-x-100 transition-transform duration-200'></div>
-                </div>
-              </button>
-              <button className='px-2 mx-3 py-3 text-[#8993A6] hover:text-white transition-colors relative group'>
-                <div className='flex flex-col items-center'>
-                  <span>График игры</span>
-                  <div className='absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] scale-x-0 group-hover:scale-x-100 transition-transform duration-200'></div>
-                </div>
-              </button>
-              <button className='px-2 mx-3 py-3 text-[#8993A6] hover:text-white transition-colors relative group'>
-                <div className='flex flex-col items-center'>
-                  <span>Общение (чат)</span>
-                  <div className='absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] scale-x-0 group-hover:scale-x-100 transition-transform duration-200'></div>
-                </div>
-              </button>
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  className={`px-2 mx-3 py-3 ${currentPath === tab.id ? 'text-white' : 'text-[#8993A6]'} hover:text-white transition-colors relative group`}
+                  onClick={() => navigate(`/matches/${matchId}/${tab.id}`)}
+                >
+                  <div className='flex flex-col items-center'>
+                    <span>{tab.label}</span>
+                    <div className={`absolute bottom-0 left-0 w-full h-[2px] bg-[#2576F0] ${currentPath === tab.id ? '' : 'scale-x-0 group-hover:scale-x-100'} transition-transform duration-200`}></div>
+                  </div>
+                </button>
+              ))}
             </div>
             <div className='flex gap-4 p-[12px]'>
-              <button className='border border-[#333B4E] px-2 rounded-lg text-[#8993A6] hover:text-white transition-colors flex items-center gap-2 text-sm'>
+              <button className='border border-[#333B4E] px-2 rounded-lg text-[#8993A6] hover:text-white hover:border-[#fff] transition-colors flex items-center gap-2 text-sm'>
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.3165 11.7755C16.9925 13.0066 15.4613 13.8765 12.3987 15.6164C9.43816 17.2983 7.95793 18.1394 6.76501 17.8013C6.27181 17.6615 5.82245 17.3961 5.46005 17.0305C4.5835 16.1461 4.5835 14.4307 4.5835 11C4.5835 7.56928 4.5835 5.85393 5.46005 4.96954C5.82245 4.60391 6.27181 4.33847 6.76501 4.19872C7.95793 3.86068 9.43816 4.70165 12.3987 6.3836C15.4613 8.12347 16.9925 8.99342 17.3165 10.2245C17.4503 10.7327 17.4503 11.2673 17.3165 11.7755Z" stroke="#BCC3D0" stroke-width="1.375" stroke-linejoin="round" />
                 </svg>
                 Смотреть игру
               </button>
 
-              <button className='border border-[#333B4E] px-2 rounded-lg text-[#8993A6] hover:text-white transition-colors flex items-center gap-2 text-sm'>
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11.0002 13.2917V4.125M11.0002 13.2917C10.3583 13.2917 9.15907 11.4636 8.7085 11M11.0002 13.2917C11.642 13.2917 12.8413 11.4636 13.2918 11" stroke="#BCC3D0" stroke-width="1.66" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M18.3332 15.125C18.3332 17.4002 17.8583 17.875 15.5832 17.875H6.4165C4.14134 17.875 3.6665 17.4002 3.6665 15.125" stroke="#BCC3D0" stroke-width="1.66" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
+              <button className='border border-[#333B4E] px-2 rounded-lg text-[#8993A6] hover:text-white hover:border-[#fff] transition-colors flex items-center gap-2 text-sm'>
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.9997 13.2917V4.125M10.9997 13.2917C10.3578 13.2917 9.15858 11.4636 8.70801 11M10.9997 13.2917C11.6415 13.2917 12.8408 11.4636 13.2913 11" stroke="#BCC3D0" stroke-width="1.66" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18.3337 15.125C18.3337 17.4002 17.8588 17.875 15.5837 17.875H6.41699C4.14183 17.875 3.66699 17.4002 3.66699 15.125" stroke="#BCC3D0" stroke-width="1.66" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
                 Скачать реплей
               </button>
 
-              <button className='border border-[#5E3030] hover:border-[#FF4747] text-[#E83B3B] px-4 py-2 rounded-lg transition-colors text-sm'>
-                Пожаловаться на игру
+              <button className='border border-[#5E3030] hover:border-[#FF4747] text-[#5E3030] hover:text-[#E83B3B] px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-2'>
+                {isChatPage ? (
+                  <img src={alert2} alt="alert" className="w-5 h-5" />
+                ) : (
+                  'Пожаловаться на игру'
+                )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Tables */}
-        <div className=''>
-          {matchData[0].teams.map((team) => (
-            <div key={team.id} className='bg-[#12151B] rounded-lg overflow-hidden my-5'>
-              <div className='overflow-x-auto'>
-                <table className='w-full'>
-                  <thead className='bg-[#12151B] border border-[#181C25] text-[#8993A6] text-sm'>
-                    <tr>
-                      <th className='py-3 px-4 text-left'>{team.name}</th>
-                      <th className='py-3 px-4 text-center'>LANE</th>
-                      <th className='py-3 px-2 text-center relative group'>
-                        LVL
-                        <OverlayTrigger
-                          placement="right"
-                          overlay={LevelTooltip()}
-                        >
-                          <span className='relative ml-2 bottom-[-2px] inline-flex items-center cursor-help'>
-                            <QuestionIcon />
-                          </span>
-                        </OverlayTrigger>
-                      </th>
-                      <th className='py-3 px-2 text-center'>K</th>
-                      <th className='py-3 px-2 text-center'>D</th>
-                      <th className='py-3 px-2 text-center'>A</th>
-                      <th className='py-3 px-2 text-center'>LH</th>
-                      <th className='py-3 px-2 text-center'>DN</th>
-                      <th className='py-3 px-2 text-center'>NK</th>
-                      <th className='py-3 px-2 text-center'>GPM</th>
-                      <th className='py-3 px-2 text-center'>XPM</th>
-                      <th className='py-3 px-2 text-center'>HD</th>
-                      <th className='py-3 px-2 text-center'>TD</th>
-                      <th className='py-3 px-2 text-center'>NW</th>
-                      <th className='py-3 px-2 text-center'>ITEMS</th>
-                      <th className='py-3 px-4 text-center'>WARDS</th>
-                    </tr>
-                  </thead>
-                  <tbody className='text-white'>
-                    {team.players.map((player, index) => (
-                      <tr key={index} className='border-t border-[#181C25] hover:bg-[#181C25]'>
-                        <td className='py-2 px-4'>
-                          <div className='flex items-center relative left-1'>
-                            <div className='relative'>
-                              <div
-                                className='absolute w-1 h-12 rounded-l-sm'
-                                style={{
-                                  backgroundColor: player.color,
-                                  left: '-0.5rem',
-                                  top: '0'
-                                }}
-                              />
-                              <img src={player.hero} alt={player.heroName} className='w-12 h-12 rounded' />
-                            </div>
-                            <div className='ml-1'>
-                              <div className='flex items-center'>
-                                {player.countryFlag && (
-                                  <img src={player.countryFlag} alt={player.country} className='w-4 h-3 mx-1' />
-                                )}
-                                <span className='text-white'>{player.nickname}</span>
-                                {player.statusIcon && (
-                                  <img src={player.statusIcon} alt="Status" className='w-4 h-4 ml-1' />
-                                )}
-                              </div>
-                              <div className='text-[#8993A6] text-xs'>{player.heroName}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className='py-2 px-4 text-center'>
-                          <div className='flex items-center justify-center gap-1'>
-                            <img src={player.lane} alt={player.laneName} className='w-8 h-8' />
-                          </div>
-                        </td>
-                        <td className='py-2 px-2 text-center'>
-                          <div className='flex justify-center'>
-                            <LevelProgress level={player.level} xp={player.xp} />
-                          </div>
-                        </td>
-                        <td className='py-2 px-2 text-center text-[#20C867]'>{player.kills}</td>
-                        <td className='py-2 px-2 text-center text-[#F23B3B]'>{player.deaths}</td>
-                        <td className='py-2 px-2 text-center text-[#2576F0]'>{player.assists}</td>
-                        <td className='py-2 px-2 text-center'>{player.lastHits}</td>
-                        <td className='py-2 px-2 text-center'>{player.denies}</td>
-                        <td className='py-2 px-2 text-center'>{player.neutralKills}</td>
-                        <td className='py-2 px-2 text-center'>{player.gpm}</td>
-                        <td className='py-2 px-2 text-center'>{player.xpm}</td>
-                        <td className='py-2 px-2 text-center'>{player.heroDamage}</td>
-                        <td className='py-2 px-2 text-center'>{player.towerDamage}</td>
-                        <td className='py-2 px-2 text-center text-[#FFB342]'>{player.networth}</td>
-                        <td className='py-2 px-2'>
-                          <div className='flex gap-1 justify-center'>
-                            {[...Array(6)].map((_, i) => (
-                              <div key={i} className='w-8 h-8 bg-[#0D0F13] rounded'>
-                                {player.items[i] && (
-                                  <img src={player.items[i]} alt="Item" className='w-8 h-8' />
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                        <td className='py-2 px-4'>
-                          <div className='flex gap-1 justify-center'>
-                            <div className='bg-[#1B1F27] rounded px-1 text-[#FFB342]'>{player.observerWards}</div>
-                            <div className='bg-[#1B1F27] rounded px-1 text-[#2576F0]'>{player.sentryWards}</div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    <tr className='border border-[#181C25] bg-[#0F1216]'>
-                      <td className='py-2 px-4 text-[#8993A6]'>ИТОГО</td>
-                      <td className='py-2 px-2'></td>
-                      <td className='py-2 px-2'></td>
-                      <td className='py-2 px-2 text-center text-[#20C867]'>{team.totalKills}</td>
-                      <td className='py-2 px-2 text-center text-[#F23B3B]'>{team.totalDeaths}</td>
-                      <td className='py-2 px-2 text-center text-[#2576F0]'>{team.totalAssists}</td>
-                      <td className='py-2 px-2 text-center'>{team.totalLastHits}</td>
-                      <td className='py-2 px-2 text-center'>{team.totalDenies}</td>
-                      <td className='py-2 px-2 text-center'>{team.totalNeutralKills}</td>
-                      <td className='py-2 px-2 text-center'>{team.averageGPM}</td>
-                      <td className='py-2 px-2 text-center'>{team.averageXPM}</td>
-                      <td className='py-2 px-2 text-center'>{team.totalHeroDamage}</td>
-                      <td className='py-2 px-2 text-center'>{team.totalTowerDamage}</td>
-                      <td className='py-2 px-2 text-center text-[#FFB342]'>{team.totalNetworth}</td>
-                      <td className='py-2 px-2'></td>
-                      <td className='py-2 px-2'>
-                        <div className='flex gap-1 justify-center'>
-                          <div className='bg-[#1B1F27] rounded px-1 text-[#FFB342]'>{team.totalObserverWards}</div>
-                          <div className='bg-[#1B1F27] rounded px-1 text-[#2576F0]'>{team.totalSentryWards}</div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
+        {/* Tab Content */}
+        <div className="my-2 tab-content">
+          <Outlet />
         </div>
 
-        {/* Ban Information */}
-        <div className='mt-10'>
-          <div className='border border-[#181C25] flex items-center gap-4 mb-4 bg-[#12151B] rounded-lg p-4'>
-            <span className='text-[#8993A6]'>БАНЫ</span>
-            <div className='flex gap-2'>
-              {[heroIcons.pudge, heroIcons.nyx, heroIcons.sf, heroIcons.bara, heroIcons.abaddon].map((hero, index) => (
-                <img key={index} src={hero} alt="Banned Hero" className='w-12 h-10 rounded' />
-              ))}
-            </div>
-          </div>
-          <div className='flex items-center gap-4 text-[#8993A6] text-sm my-2 bg-[#12151B] rounded-lg p-4'>
-            <div className='flex items-center gap-2'>
-              <span>Хост:</span>
-              <span className='text-white'>shuname</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <span>Карта:</span>
-              <span className='text-white'>Dota 6.85 BCN</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <span>Хостбот:</span>
-              <span className='text-white'>BattleCup-Game-Bot #UZ1</span>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </>
   )

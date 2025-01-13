@@ -15,6 +15,9 @@ export default {
           '50%': { transform: 'translateY(100px)' },
         },
       },
+      gridTemplateColumns: {
+        '25': 'repeat(25, minmax(0, 1fr))',
+      }
     },
   },
   plugins: [],

@@ -227,8 +227,8 @@ export default function Profile() {
                 </div>
 
                 {/* Navigation */}
-                <div className='mt-6 border border-[#181C25] bg-[#12151B]'>
-                    <div className='flex justify-around border border-[#181C25] bg-[#12151B]'>
+                <div className='mt-6 border border-[#181C25] bg-[#12151B] rounded-lg'>
+                    <div className='flex justify-around border border-[#181C25] bg-[#12151B] rounded-lg'>
                         <button
                             onClick={() => {
                                 setActiveTab('info')

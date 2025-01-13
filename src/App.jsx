@@ -11,6 +11,9 @@ import ProfileInfo from './pages/ProfileInfo'
 import NotFound from './pages/NotFound'
 import MatchList from './components/profile/profileMatchlist'
 import MatchDetails from './pages/MatchDetails'
+import PlayStyleTimeline from './pages/PlayStyleTimeline'
+import {Overview} from './pages/Overview'
+import Chat from './pages/Chat'
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -63,8 +66,15 @@ export default function App() {
           <Route path="awards" element={<div className='text-white'>Mukofotlar tez orada...</div>} />
           <Route path="forums" element={<div className='text-white'>Forum postlari tez orada...</div>} />
         </Route>
-        <Route path="/matches/:matchId" element={<MatchDetails />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/matches/:matchId" element={<MatchDetails />}>
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<Overview />} />
+          <Route path="playstyle" element={<PlayStyleTimeline />} />
+          <Route path="items" element={<div>Items Content</div>} />
+          <Route path="graph" element={<div>Graph Content</div>} />
+          <Route path="chat" element={<Chat />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
