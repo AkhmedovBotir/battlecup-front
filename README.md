@@ -14,7 +14,7 @@ BattleCup - bu platforma. Bu platforma orqali o'yinchilar turnirlar tashkil qili
 
 1. Repozitoriyani klonlash:
 ```bash
-git clone https://github.com/username/BattleCup.git
+git clone https://github.com/AkhmedovBotir/BattleCup.git
 cd BattleCup
 ```
 
