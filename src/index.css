@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #3787FF #1A1D24;
+}
+
+body{
+  background-image: url('./img/login_bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #0A0C10;
+}
+#root{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: -1;
+  background-color: #0b0d10c4;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background: #0A0C10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3787FF;
+  border-radius: 20px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #20C867;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0C10;
+  border-radius: 3px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

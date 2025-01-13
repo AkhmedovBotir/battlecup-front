@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://battlecup.uz/sitemap.xml
+
+# Important pages
+Allow: /profile
+Allow: /matches
+Allow: /tournaments
+Allow: /teams
+
+# Disallow admin and service pages
+Disallow: /admin
+Disallow: /api/
+Disallow: /service-worker.js
