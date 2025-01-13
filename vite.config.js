@@ -3,15 +3,28 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import legacy from '@vitejs/plugin-legacy';
 import viteCompression from 'vite-plugin-compression';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 export default defineConfig({
   plugins: [
     react(),
+    ViteImageOptimizer({
+      png: {
+        quality: 70,
+        compressionLevel: 8,
+      },
+      jpg: {
+        quality: 70,
+      },
+      jpeg: {
+        quality: 70,
+      },
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8MB
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
+        globPatterns: ['**/*.{js,css,html,ico,svg,json,vue,txt,woff2}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.battlecup\.uz\/.*/i,
@@ -65,6 +78,8 @@ export default defineConfig({
         short_name: 'BattleCup',
         description: 'Dota 2 turnirlar platformasi',
         theme_color: '#0B0D10',
+        background_color: '#0B0D10',
+        display: 'standalone',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -106,6 +121,12 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           utils: ['web-vitals', 'date-fns'],
+        },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name.endsWith('.png')) {
+            return 'assets/images/[name]-[hash][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
         },
       },
     },
