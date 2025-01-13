@@ -23,8 +23,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
+        maximumFileSizeToCacheInBytes: 2 * 1024 * 1024, // 2MB
         globPatterns: ['**/*.{js,css,html,ico,svg,json,vue,txt,woff2}'],
+        globIgnores: ['**/banner-*.png'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.battlecup\.uz\/.*/i,
@@ -58,7 +59,7 @@ export default defineConfig({
             urlPattern: /\.(png|jpg|jpeg|gif|webp)$/,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'large-images-cache',
+              cacheName: 'images-cache',
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
