@@ -5,10 +5,6 @@ BattleCup - bu platforma. Bu platforma orqali o'yinchilar turnirlar tashkil qili
 ## Ishlatilgan texnologiyalar
 
 - Frontend: React.js, TailwindCSS
-- Backend: Node.js, Express.js
-- Database: MongoDB
-- Real-time: Socket.io
-- Authentication: JWT
 
 ## O'rnatish yo'riqnomasi
 
